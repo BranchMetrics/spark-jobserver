@@ -1,7 +1,6 @@
 package spark.jobserver.util
 
 import java.util.Map.Entry
-import java.lang.ref.SoftReference
 
 /**
  * A convenience class to define a Least-Recently-Used Cache with a maximum size.

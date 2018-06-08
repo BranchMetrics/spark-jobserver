@@ -4,8 +4,6 @@ import akka.actor.Props
 import com.typesafe.config.Config
 import ooyala.common.akka.InstrumentedActor
 import org.joda.time.DateTime
-import spark.jobserver.io.JobDAOActor.SaveJar
-import spark.jobserver.util.JarUtils
 
 object JobDAOActor {
 

@@ -531,7 +531,7 @@ class WebApi(system: ActorSystem,
   override def timeoutRoute: Route =
     complete(500, errMap("Request timed out. Try using the /jobs/<jobID>, /jobs APIs to get status/results"))
 
-  private def getJobManagerForContext(context: Option[String],
+   def getJobManagerForContext(context: Option[String],
                                       contextConfig: Config,
                                       classPath: String): Option[ActorRef] = {
     import ContextSupervisor._

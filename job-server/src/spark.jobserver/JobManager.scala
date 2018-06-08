@@ -2,13 +2,12 @@ package spark.jobserver
 
 import java.io.File
 
-import akka.actor.{AddressFromURIString, Address, Props, ActorSystem}
+import akka.actor.{ActorSystem, AddressFromURIString, Props}
 import akka.cluster.Cluster
-import com.typesafe.config.{ConfigValueFactory, ConfigFactory, Config}
+import com.typesafe.config.{Config, ConfigFactory, ConfigValueFactory}
 import ooyala.common.akka.actor.ProductionReaper
 import ooyala.common.akka.actor.Reaper.WatchMe
 import org.slf4j.LoggerFactory
-import spark.jobserver.io.{JobDAOActor, JobDAO}
 
 /**
  * The JobManager is the main entry point for the forked JVM process running an individual

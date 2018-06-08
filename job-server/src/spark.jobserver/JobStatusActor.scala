@@ -5,9 +5,10 @@ import com.yammer.metrics.core.Meter
 import ooyala.common.akka.InstrumentedActor
 import ooyala.common.akka.metrics.YammerMetrics
 import org.joda.time.DateTime
+import spark.jobserver.io.{JobDAOActor, JobInfo}
+
 import scala.collection.mutable
 import scala.util.Try
-import spark.jobserver.io.{JobDAOActor, JobInfo, JobDAO}
 
 object JobStatusActor {
   case class JobInit(jobInfo: JobInfo)

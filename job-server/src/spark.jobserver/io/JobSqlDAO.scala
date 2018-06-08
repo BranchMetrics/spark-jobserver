@@ -100,7 +100,13 @@ class JobSqlDAO(config: Config) extends JobDAO {
     flyway.setDataSource(jdbcUrl, jdbcUser, jdbcPassword)
     // TODO: flyway.setLocations(migrateLocations) should be removed when tests have a running configuration
     flyway.setLocations(migrateLocations)
-    flyway.migrate()
+    try{
+      flyway.migrate()
+
+    } catch {
+      case e:Exception =>
+        e.printStackTrace()
+    }
   }
 
   override def saveJar(appName: String, uploadTime: DateTime, jarBytes: Array[Byte]) {

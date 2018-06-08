@@ -1,22 +1,20 @@
 package spark.jobserver
 
+import java.net.{URI, URL}
 import java.util.concurrent.Executors._
+import java.util.concurrent.atomic.AtomicInteger
 
 import akka.actor.{ActorRef, PoisonPill, Props}
 import com.typesafe.config.Config
-import java.net.{URI, URL}
-import java.util.concurrent.atomic.AtomicInteger
-
 import ooyala.common.akka.InstrumentedActor
 import org.apache.hadoop.conf.Configuration
-import org.apache.spark.{SparkConf, SparkContext, SparkEnv}
+import org.apache.spark.{SparkConf, SparkEnv}
 import org.joda.time.DateTime
+import spark.jobserver.io.{JarInfo, JobDAOActor, JobInfo}
+import spark.jobserver.util.{ContextURLClassLoader, SparkJobUtils}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success, Try}
-import spark.jobserver.ContextSupervisor.StopContext
-import spark.jobserver.io.{JarInfo, JobDAO, JobDAOActor, JobInfo}
-import spark.jobserver.util.{ContextURLClassLoader, SparkJobUtils}
 
 object JobManagerActor {
   // Messages
@@ -71,8 +69,9 @@ class JobManagerActor(contextConfig: Config) extends InstrumentedActor {
 
   import CommonMessages._
   import JobManagerActor._
-  import scala.util.control.Breaks._
+
   import collection.JavaConverters._
+  import scala.util.control.Breaks._
 
   val config = context.system.settings.config
   private val maxRunningJobs = SparkJobUtils.getMaxRunningJobs(config)
@@ -192,10 +191,11 @@ class JobManagerActor(contextConfig: Config) extends InstrumentedActor {
     breakable {
       import akka.pattern.ask
       import akka.util.Timeout
-      import scala.concurrent.duration._
-      import scala.concurrent.Await
 
-      val daoAskTimeout = Timeout(3 seconds)
+      import scala.concurrent.Await
+      import scala.concurrent.duration._
+
+      val daoAskTimeout = Timeout(100 seconds)
       // TODO: refactor so we don't need Await, instead flatmap into more futures
       val resp = Await.result(
         (daoActor ? JobDAOActor.GetLastUploadTime(appName))(daoAskTimeout).mapTo[JobDAOActor.LastUploadTime],

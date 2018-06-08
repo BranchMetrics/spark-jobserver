@@ -1,15 +1,14 @@
 package spark.jobserver
 
 import java.net.URL
+
 import akka.actor.ActorRef
 import akka.util.Timeout
-import org.apache.spark.{SparkContext, SparkEnv}
+import org.apache.spark.SparkContext
 import org.joda.time.DateTime
 import org.slf4j.LoggerFactory
 import spark.jobserver.io.JobDAOActor
 import spark.jobserver.util.{ContextURLClassLoader, JarUtils, LRUCache}
-
-import scala.util.{Success, Failure}
 
 case class JobJarInfo(constructor: () => SparkJobBase,
                       className: String,
@@ -36,6 +35,7 @@ class JobCache(maxEntries: Int, dao: ActorRef, sparkContext: SparkContext, loade
   def getSparkJob(appName: String, uploadTime: DateTime, classPath: String): JobJarInfo = {
     cache.get((appName, uploadTime, classPath), {
       import akka.pattern.ask
+
       import scala.concurrent.Await
 
       val jarPathReq = (dao ? JobDAOActor.GetJarPath(appName, uploadTime)).mapTo[JobDAOActor.JarPath]

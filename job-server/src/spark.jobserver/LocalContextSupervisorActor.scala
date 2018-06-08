@@ -1,19 +1,15 @@
 package spark.jobserver
 
-import akka.actor.{Terminated, Props, ActorRef, PoisonPill}
+import akka.actor.{ActorRef, PoisonPill, Props, Terminated}
 import akka.pattern.ask
 import akka.util.Timeout
-import com.typesafe.config.Config
-import com.typesafe.config.ConfigFactory
+import com.typesafe.config.{Config, ConfigFactory}
 import ooyala.common.akka.InstrumentedActor
-import spark.jobserver.JobManagerActor.{SparkContextDead, SparkContextAlive, SparkContextStatus}
-import spark.jobserver.io.JobDAO
+import spark.jobserver.JobManagerActor.{SparkContextAlive, SparkContextDead, SparkContextStatus}
 import spark.jobserver.util.SparkJobUtils
+
 import scala.collection.mutable
-import scala.concurrent.Await
 import scala.util.{Failure, Success, Try}
-import org.joda.time.DateTime
-import org.joda.time.format.DateTimeFormat
 
 /** Messages common to all ContextSupervisors */
 object ContextSupervisor {
@@ -69,6 +65,7 @@ object ContextSupervisor {
  */
 class LocalContextSupervisorActor(dao: ActorRef) extends InstrumentedActor {
   import ContextSupervisor._
+
   import scala.collection.JavaConverters._
   import scala.concurrent.duration._
 
@@ -192,10 +189,11 @@ class LocalContextSupervisorActor(dao: ActorRef) extends InstrumentedActor {
   private def addContextsFromConfig(config: Config) {
     for (contexts <- Try(config.getObject("spark.contexts"))) {
       contexts.keySet().asScala.foreach { contextName =>
+        val streamContext=contextName + "-" + config.getString("spark.job.stream.topic")
         val contextConfig = config.getConfig("spark.contexts." + contextName)
           .withFallback(defaultContextConfig)
-        startContext(contextName, contextConfig, false, contextTimeout) { ref => } {
-          e => logger.error("Unable to start context " + contextName, e)
+        startContext(streamContext, contextConfig, false, contextTimeout) { ref => } {
+          e => logger.error("Unable to start context " + streamContext, e)
         }
         Thread sleep 500 // Give some spacing so multiple contexts can be created
       }

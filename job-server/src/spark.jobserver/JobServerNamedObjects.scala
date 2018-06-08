@@ -2,13 +2,13 @@ package spark.jobserver
 
 import akka.actor.ActorSystem
 import akka.util.Timeout
-import scala.concurrent.Future
-import scala.concurrent.ExecutionContext
-import scala.concurrent.duration._
-import scala.util.{Try, Success, Failure}
 import org.slf4j.LoggerFactory
-import spray.caching.{ LruCache, Cache }
+import spray.caching.{Cache, LruCache}
 import spray.util._
+
+import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.duration._
+import scala.util.{Failure, Success}
 
 /**
  * An implementation of [[NamedObjects]] API for the Job Server.

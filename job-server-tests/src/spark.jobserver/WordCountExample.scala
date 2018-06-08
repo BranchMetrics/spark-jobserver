@@ -2,7 +2,7 @@ package spark.jobserver
 
 import com.typesafe.config.{Config, ConfigFactory}
 import org.apache.spark._
-import org.apache.spark.SparkContext._
+
 import scala.util.Try
 
 /**

@@ -1,8 +1,7 @@
 package spark.jobserver
 
-import spray.http._
 import spray.http.HttpHeaders._
-import spray.http.HttpMethods._
+import spray.http._
 import spray.routing._
 
 // origin of code:

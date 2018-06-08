@@ -29,11 +29,7 @@ GC_OPTS="-XX:+UseConcMarkSweepGC
 # -Djava.rmi.server.hostname equal to the hostname in that environment.  This is specific
 # depending on AWS vs GCE etc.
 JAVA_OPTS="-XX:MaxDirectMemorySize=$MAX_DIRECT_MEMORY \
-           -XX:+HeapDumpOnOutOfMemoryError -Djava.net.preferIPv4Stack=true \
-           -Dcom.sun.management.jmxremote.port=9999 \
-           -Dcom.sun.management.jmxremote.rmi.port=9999 \
-           -Dcom.sun.management.jmxremote.authenticate=false \
-           -Dcom.sun.management.jmxremote.ssl=false"
+           -XX:+HeapDumpOnOutOfMemoryError -Djava.net.preferIPv4Stack=true"
 
 MAIN="spark.jobserver.JobServer"
 

@@ -1,14 +1,11 @@
-import scalariform.formatter.preferences._
-
+import bintray.Plugin.bintrayPublishSettings
 import com.typesafe.sbt.SbtScalariform._
 import sbt.Keys._
 import sbt._
 import sbtassembly.AssemblyPlugin.autoImport._
-import spray.revolver.RevolverPlugin._
-import com.typesafe.sbt.SbtScalariform._
-import scalariform.formatter.preferences._
-import bintray.Plugin.bintrayPublishSettings
 import scoverage.ScoverageKeys._
+
+import scalariform.formatter.preferences._
 
 // There are advantages to using real Scala build files with SBT:
 //  - Multi-JVM testing won't work without it, for now
@@ -109,17 +106,11 @@ object JobServerBuild extends Build {
       val artifact = (outputPath in assembly in jobServerExtras).value
       val artifactTargetPath = s"/app/${artifact.name}"
       new sbtdocker.mutable.Dockerfile {
-        from(s"java:${javaVersion}")
+         from(s"docker.branch.io/spark-java:0.0.1")
+       // from(s"java:${javaVersion}")
         // Dockerfile best practices: https://docs.docker.com/articles/dockerfile_best-practices/
-        expose(8090)
+        expose(8092)
         expose(9999)    // for JMX
-        env("MESOS_VERSION", mesosVersion)
-        runRaw("""echo "deb http://repos.mesosphere.io/ubuntu/ trusty main" > /etc/apt/sources.list.d/mesosphere.list && \
-                  apt-key adv --keyserver keyserver.ubuntu.com --recv E56151BF && \
-                  apt-get -y update && \
-                  apt-get -y install mesos=${MESOS_VERSION} && \
-                  apt-get clean
-               """)
         copy(artifact, artifactTargetPath)
         copy(baseDirectory(_ / "bin" / "server_start.sh").value, file("app/server_start.sh"))
         copy(baseDirectory(_ / "bin" / "server_stop.sh").value, file("app/server_stop.sh"))
@@ -129,24 +120,18 @@ object JobServerBuild extends Build {
         copy(baseDirectory(_ / "config" / "docker.conf").value, file("app/docker.conf"))
         copy(baseDirectory(_ / "config" / "docker.sh").value, file("app/settings.sh"))
         // Including envs in Dockerfile makes it easy to override from docker command
-        env("JOBSERVER_MEMORY", "1G")
-        env("SPARK_HOME", "/spark")
-        env("SPARK_BUILD", s"spark-${sparkVersion}-bin-hadoop2.4")
+        env("JOBSERVER_MEMORY", "2G")
+        env("SPARK_HOME", "/root/spark")
         // Use a volume to persist database between container invocations
         run("mkdir", "-p", "/database")
-        runRaw("""wget http://d3kbcqa49mib13.cloudfront.net/$SPARK_BUILD.tgz && \
-                  tar -xvf $SPARK_BUILD.tgz && \
-                  mv $SPARK_BUILD /spark && \
-                  rm $SPARK_BUILD.tgz
-               """)
         volume("/database")
         entryPoint("app/server_start.sh")
       }
     },
     imageNames in docker := Seq(
-      sbtdocker.ImageName(namespace = Some("velvia"),
+      sbtdocker.ImageName(namespace = Some("docker.branch.io"),
                           repository = "spark-jobserver",
-                          tag = Some(s"${version.value}.mesos-${mesosVersion.split('-')(0)}.spark-${sparkVersion}"))
+                          tag = Some("0.0.1"))
     )
   )
 
@@ -168,6 +153,8 @@ object JobServerBuild extends Build {
     // Give job server a bit more PermGen since it does classloading
     javaOptions in reStart += "-XX:MaxPermSize=256m",
     javaOptions in reStart += "-Djava.security.krb5.realm= -Djava.security.krb5.kdc=",
+    javaOptions in reStart += "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005",
+    // debugSettings :="-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005",
     // This lets us add Spark back to the classpath without assembly barfing
     fullClasspath in reStart := (fullClasspath in Compile).value,
     mainClass in reStart := Some("spark.jobserver.JobServer")

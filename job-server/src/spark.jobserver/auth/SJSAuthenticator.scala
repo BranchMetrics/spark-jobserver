@@ -1,23 +1,13 @@
 package spark.jobserver.auth
 
-import scala.concurrent.Future
-import scala.concurrent.ExecutionContext
-import spray.routing.directives.AuthMagnet
-import spray.routing.authentication.UserPass
-import spray.routing.authentication.BasicAuth
-
-import spray.routing.authentication._
-import spray.routing.directives.AuthMagnet
-
-import scala.concurrent.duration.Duration
-import scala.concurrent.{ Await, ExecutionContext, Future }
-import org.slf4j.LoggerFactory
-import org.slf4j.Logger
 import org.apache.shiro.SecurityUtils
 import org.apache.shiro.authc._
 import org.apache.shiro.authz.AuthorizationException
-import org.apache.shiro.util.Factory
-import org.apache.shiro.subject.Subject
+import org.slf4j.{Logger, LoggerFactory}
+import spray.routing.authentication.{BasicAuth, UserPass}
+import spray.routing.directives.AuthMagnet
+
+import scala.concurrent.{Await, ExecutionContext, Future}
 
 /**
  * Apache Shiro based authenticator for the Spark JobServer, the authenticator realm must be
@@ -48,7 +38,6 @@ trait SJSAuthenticator {
    * do not call directly - only for unit testing!
    */
   def explicitValidation(userPass: UserPass, logger: Logger): Option[AuthInfo] = {
-    import collection.JavaConverters._
     val currentUser = SecurityUtils.getSubject()
     val UserPass(user, pass) = userPass
     val token = new UsernamePasswordToken(user, pass)

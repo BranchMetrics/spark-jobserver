@@ -1,13 +1,13 @@
 package spark.jobserver
 
+import java.nio.file.{Files, Paths}
+
 import akka.actor.ActorRef
 import akka.util.Timeout
 import ooyala.common.akka.InstrumentedActor
-import spark.jobserver.io.{JobDAOActor, JobDAO}
-import spark.jobserver.util.JarUtils
 import org.joda.time.DateTime
-
-import java.nio.file.{Files, Paths}
+import spark.jobserver.io.JobDAOActor
+import spark.jobserver.util.JarUtils
 
 // Messages to JarManager actor
 

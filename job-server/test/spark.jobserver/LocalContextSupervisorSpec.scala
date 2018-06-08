@@ -8,9 +8,9 @@ import org.scalatest.{BeforeAndAfter, BeforeAndAfterAll, FunSpecLike, Matchers}
 
 import scala.concurrent.duration._
 
-
 object LocalContextSupervisorSpec {
-  val config = ConfigFactory.parseString("""
+  val config = ConfigFactory.parseString(
+    """
     spark {
       master = "local[4]"
       temp-contexts {
@@ -47,18 +47,25 @@ object LocalContextSupervisorSpec {
   val system = ActorSystem("test", config)
 }
 
-class LocalContextSupervisorSpec extends TestKit(LocalContextSupervisorSpec.system) with ImplicitSender
-    with FunSpecLike with Matchers with BeforeAndAfter with BeforeAndAfterAll {
+class LocalContextSupervisorSpec
+    extends TestKit(LocalContextSupervisorSpec.system)
+    with ImplicitSender
+    with FunSpecLike
+    with Matchers
+    with BeforeAndAfter
+    with BeforeAndAfterAll {
 
   override def afterAll() {
-    ooyala.common.akka.AkkaTestUtils.shutdownAndWait(LocalContextSupervisorSpec.system)
+    ooyala.common.akka.AkkaTestUtils
+      .shutdownAndWait(LocalContextSupervisorSpec.system)
   }
 
   var supervisor: ActorRef = _
   var dao: JobDAO = _
   var daoActor: ActorRef = _
 
-  val contextConfig = LocalContextSupervisorSpec.config.getConfig("spark.context-settings")
+  val contextConfig =
+    LocalContextSupervisorSpec.config.getConfig("spark.context-settings")
 
   // This is needed to help tests pass on some MBPs when working from home
   System.setProperty("spark.driver.host", "localhost")
@@ -66,7 +73,8 @@ class LocalContextSupervisorSpec extends TestKit(LocalContextSupervisorSpec.syst
   before {
     dao = new InMemoryDAO
     daoActor = system.actorOf(JobDAOActor.props(dao))
-    supervisor = system.actorOf(Props(classOf[LocalContextSupervisorActor], daoActor))
+    supervisor =
+      system.actorOf(Props(classOf[LocalContextSupervisorActor], daoActor))
   }
 
   after {

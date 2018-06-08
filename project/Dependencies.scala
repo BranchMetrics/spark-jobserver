@@ -9,6 +9,8 @@ object Dependencies {
   val excludeAsm = ExclusionRule(organization = "asm")
   val excludeQQ = ExclusionRule(organization = "org.scalamacros")
   val jdkVersion = scala.util.Properties.isJavaAtLeast("1.8")
+  val excludeJetty = ExclusionRule(organization = "org.eclipse.jetty")
+  val excludeServlet = ExclusionRule(organization = "javax.servlet")
 
   lazy val typeSafeConfigDeps = if(jdkVersion){
     "com.typesafe" % "config" % "1.3.0"
@@ -50,12 +52,16 @@ object Dependencies {
     "org.apache.spark" %% "spark-mllib" % sparkVersion % "provided" excludeAll(excludeNettyIo, excludeQQ),
     "org.apache.spark" %% "spark-sql" % sparkVersion % "provided" excludeAll(excludeNettyIo, excludeQQ),
     "org.apache.spark" %% "spark-streaming" % sparkVersion % "provided" excludeAll(excludeNettyIo, excludeQQ),
-    "org.apache.spark" %% "spark-hive" % sparkVersion % "provided" excludeAll(excludeNettyIo, excludeQQ, excludeScalaTest)
+    "org.apache.spark" %% "spark-hive" % sparkVersion % "provided" excludeAll(excludeNettyIo, excludeQQ, excludeScalaTest),
+    "org.apache.spark" %% "spark-streaming-kafka" % sparkVersion,
+    "org.apache.hadoop" % "hadoop-aws" % "2.7.1" excludeAll (excludeJetty, excludeServlet)
+
   )
 
   lazy val slickDeps = Seq(
     "com.typesafe.slick" %% "slick" % "2.1.0",
     "com.h2database" % "h2" % "1.3.176",
+    "mysql" % "mysql-connector-java" % "5.1.12",
     "commons-dbcp" % "commons-dbcp" % "1.4",
     "org.flywaydb" % "flyway-core" % "3.2.1"
   )
